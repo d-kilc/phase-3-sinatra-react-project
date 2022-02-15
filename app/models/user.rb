@@ -1,3 +1,4 @@
 class User < ActiveRecord::Base
-    has_many :trips
+    has_many :usertrips
+    has_many :trips, through: :usertrips
 end
