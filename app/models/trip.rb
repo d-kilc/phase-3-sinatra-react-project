@@ -1,5 +1,5 @@
 class Trip < ActiveRecord::Base
     has_many :segments
-    has_many :usertrips
-    has_many :users, through: :usertrips
+    has_many :user_trips
+    has_many :users, through: :user_trips
 end

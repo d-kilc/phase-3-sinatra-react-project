@@ -25,19 +25,19 @@ ActiveRecord::Schema.define(version: 2022_02_15_163209) do
     t.string "description"
   end
 
+  create_table "user_trips", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "trip_id"
+    t.string "role"
+    t.index ["trip_id"], name: "index_user_trips_on_trip_id"
+    t.index ["user_id"], name: "index_user_trips_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username"
   end
 
-  create_table "usertrips", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "trip_id"
-    t.string "role"
-    t.index ["trip_id"], name: "index_usertrips_on_trip_id"
-    t.index ["user_id"], name: "index_usertrips_on_user_id"
-  end
-
   add_foreign_key "segments", "trips"
-  add_foreign_key "usertrips", "trips"
-  add_foreign_key "usertrips", "users"
+  add_foreign_key "user_trips", "trips"
+  add_foreign_key "user_trips", "users"
 end

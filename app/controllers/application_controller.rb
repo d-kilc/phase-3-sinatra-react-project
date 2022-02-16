@@ -1,24 +1,20 @@
 class ApplicationController < Sinatra::Base
   set :default_content_type, 'application/json'
   
-  # return all trips
-  get '/trips' do
-    Trip.all.to_json
-  end
+  # return ALL trips
+  # get '/trips' do
+  #   Trip.all.to_json
+  # end
 
   #placeholder- get dummy user and trips and segments
   get '/users' do
-    User.first.to_json(
-      include: {
-        trips: {include: :segments}
-      }
-    )
+    User.first.to_json
   end
   
   #returns all user's trips and segments
   get "/trips/:id" do
     current_user_id = params[:id]
-    user_trips = User.find(current_user_id).usertrips
+    user_trips = User.find(current_user_id).user_trips
     user_trips.to_json(
       include: {
         trip: {include: :segments}
@@ -31,20 +27,21 @@ class ApplicationController < Sinatra::Base
     #   } 
   end
 
-  # posts a trip and segments to a user
+  # save trip -> create trip, usertrip, and segment records for new trip
+  # posts a trip and segments to user's profile
   post '/trips' do
     new_trip = Trip.create(description: params[:tripName])
-    new_usertrip = Usertrip.create(user_id: params[:user_id], trip_id: new_trip.id, role: 'creator')
+    new_user_trip = UserTrip.create(user_id: params[:user_id], trip_id: new_trip.id, role: 'creator')
 
     params[:segments].each do |segment|
       Segment.create(from: segment[:from], to: segment[:to], date: segment[:date], trip_id: new_trip.id)
     end
 
-    #return all user's trips after post
+    #return all user's trips and segments after post
     new_trip.to_json(include: :segments)
   end
 
-  # get all the users for a trip so we can show everyone that's going
+  # get all users for a trip
   get '/trips/:id/users' do
     trip_id = params[:id]
     Trip.find(trip_id).users.to_json
