@@ -47,4 +47,36 @@ class ApplicationController < Sinatra::Base
     Trip.find(trip_id).users.to_json
   end
 
+  # patch segment
+  patch '/segments/:id' do
+    segment_id = params[:id]
+    segment = Segment.find(segment_id)
+    
+    segment.from = params[:from]
+    segment.to = params[:to]
+    segment.date = params[:date]
+
+    segment.save
+    segment.to_json
+  end
+
+  # delete segment
+  delete '/segments/:id' do
+    segment_id = params[:id]
+    segment = Segment.find(segment_id)
+
+    segment.destroy
+  end
+
+  # function updateTrip(key, value, segmentId, tripId) {
+  #   fetch(`http://localhost:9292/trips/${tripId}`, {
+  #     method: 'PATCH',
+  #     headers: {"Content-Type": "application/json", Accept: "application/json"},
+  #     body: JSON.stringify({
+  #       trip_id: tripId,
+  #       segment_id: segmentId,
+  #       [key]: value,
+  #     })
+  #   })
+
 end
