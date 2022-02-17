@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_15_163209) do
+ActiveRecord::Schema.define(version: 2022_02_17_005509) do
+
+  create_table "events", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.datetime "start"
+    t.datetime "end"
+    t.integer "user_id"
+    t.integer "trip_id"
+    t.index ["trip_id"], name: "index_events_on_trip_id"
+    t.index ["user_id"], name: "index_events_on_user_id"
+  end
 
   create_table "segments", force: :cascade do |t|
     t.string "from"
@@ -37,6 +48,8 @@ ActiveRecord::Schema.define(version: 2022_02_15_163209) do
     t.string "username"
   end
 
+  add_foreign_key "events", "trips"
+  add_foreign_key "events", "users"
   add_foreign_key "segments", "trips"
   add_foreign_key "user_trips", "trips"
   add_foreign_key "user_trips", "users"

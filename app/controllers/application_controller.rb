@@ -1,10 +1,5 @@
 class ApplicationController < Sinatra::Base
   set :default_content_type, 'application/json'
-  
-  # return ALL trips
-  # get '/trips' do
-  #   Trip.all.to_json
-  # end
 
   #placeholder- get dummy user and trips and segments
   get '/users' do
@@ -12,19 +7,56 @@ class ApplicationController < Sinatra::Base
   end
   
   #returns all user's trips and segments
-  get "/trips/:id" do
-    current_user_id = params[:id]
+  get "/users/:user_id/trips" do
+    current_user_id = params[:user_id]
     user_trips = User.find(current_user_id).user_trips
     user_trips.to_json(
       include: {
         trip: {include: :segments}
       }
     )
-    # Clinic.all.to_json(
-    #   only: [:clinic_name],
-    #   include: { 
-    #       patients: {only: [:name, :species]}
-    #   } 
+  end
+
+  # get a single trip for a user 
+  get '/users/:user_id/trips/:trip_id' do
+    current_user_id = params[:user_id]
+    trip_id = params[:trip_id]
+    user_trips = User.find(current_user_id).user_trips
+    trip = user_trips.find_by_trip_id(trip_id)
+    trip.to_json(
+      include: {
+        trip: {include: :segments}
+      }
+    )
+  end
+
+  # get events associated with a trip
+  get '/trips/:id/events' do
+    trip_id = params[:id]
+    Trip.find(trip_id).events.all.to_json
+  end
+
+  # get all users for a trip
+  get '/trips/:id/users' do
+    trip_id = params[:id]
+    Trip.find(trip_id).users.all.to_json
+  end
+
+  post '/events' do
+    Event.create(
+      trip_id: params[:trip_id],
+      user_id: params[:user_id],
+      name: params[:name],
+      description: params[:description],
+      start: params[:start],
+      end: params[:end]
+    ).to_json
+  end
+
+  delete '/events/:id' do
+    event_id = params[:id]
+    event = Event.find(event_id)
+    event.destroy.to_json
   end
 
   # save trip -> create trip, usertrip, and segment records for new trip
@@ -39,12 +71,6 @@ class ApplicationController < Sinatra::Base
 
     #return all user's trips and segments after post
     new_trip.to_json(include: :segments)
-  end
-
-  # get all users for a trip
-  get '/trips/:id/users' do
-    trip_id = params[:id]
-    Trip.find(trip_id).users.to_json
   end
 
   # patch segment
@@ -64,19 +90,6 @@ class ApplicationController < Sinatra::Base
   delete '/segments/:id' do
     segment_id = params[:id]
     segment = Segment.find(segment_id)
-
-    segment.destroy
+    segment.destroy.to_json
   end
-
-  # function updateTrip(key, value, segmentId, tripId) {
-  #   fetch(`http://localhost:9292/trips/${tripId}`, {
-  #     method: 'PATCH',
-  #     headers: {"Content-Type": "application/json", Accept: "application/json"},
-  #     body: JSON.stringify({
-  #       trip_id: tripId,
-  #       segment_id: segmentId,
-  #       [key]: value,
-  #     })
-  #   })
-
 end
